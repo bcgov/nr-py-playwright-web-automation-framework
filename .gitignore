@@ -7,6 +7,7 @@
 **pycache**/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 # Virtual environments
 
@@ -31,6 +32,10 @@ playwright/.cache/
 playwright-report/
 test-results/
 trace.zip
+*.trace
+*.trace.zip
+*.har
+
 
 # Browser downloads
 
@@ -49,6 +54,7 @@ reports/
 *.pdf
 *.png
 *.jpg
+*.db
 
 # =========================
 
@@ -67,6 +73,7 @@ reports/
 .env
 .env.*
 config/secrets.yaml
+config/auth_state.json
 storage_state.json
 auth.json
 
