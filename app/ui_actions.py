@@ -3,16 +3,25 @@ from __future__ import annotations
 
 import re
 import time
+from datetime import datetime
+from pathlib import Path
 import os
 from typing import List
 from playwright.sync_api import Page, expect, Locator
 
-def get_screenshot_path(filename):
+def _slug(text: str) -> str:
+    """Safe for filenames across OSes: keep alnum, dash, underscore, dot; replace spaces with underscores."""
+    return re.sub(r"[^A-Za-z0-9_\-\.]", "", text.strip().replace(" ", "_"))
+
+
+def get_screenshot_path(filename: str) -> str:
     # Creates 'output/dropdown_screenshots' if it doesn't exist
-    folder = os.path.join("output", "dropdown_screenshots")
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    return os.path.join(folder, f"{filename}_{int(time.time())}.png")
+    base_dir = os.getenv("SCREENSHOT_DIR", "output/dropdown_screenshots")
+    folder = Path(base_dir).resolve()
+    folder.mkdir(parents=True, exist_ok=True)
+
+    ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    return str(folder / f"{_slug(filename)}_{ts}.png")
 
 def select_dropdown(page, selector, value):
     """Handles native <select> elements"""
@@ -23,15 +32,26 @@ def select_dropdown(page, selector, value):
     element.select_option(label=value)
     
     # --- ELEMENT-ONLY SCREENSHOT ---
-    # Captures only the menu, not the whole browser window
-    panel.screenshot(path=get_screenshot_path(f"dropdown_{val}"))
+    # Captures only the menu, not the whole browser window   
+    path = get_screenshot_path(f"dropdown_{value}")
+    element.screenshot(path=path)
+    print(f"[screenshot saved] {path}")
+
+    # --- ELEMENT-ONLY SCREENSHOT ---
+ #   element.screenshot(path=get_screenshot_path("dropdown"))
+
 
 def fill_input(page, selector, value):
     element = page.locator(selector)
     # 1. Click to focus and clear any existing default text
-    element.click() 
+    element.click()
+    page.keyboard.press("Control+A")
+    page.keyboard.press("Delete")
+ 
     # 2. Clear the field manually if .fill() isn't working perfectly
-    element.fill("") 
+    element.fill("")
+    page.wait_for_timeout(50)
+     
     # 3. Type the new value
     element.type(str(value), delay=50) 
     # 4. CRITICAL: Press Tab to trigger the 'onchange' or 'onblur' event
@@ -105,18 +125,20 @@ def set_dropdown_by_text(page, selector, val):
     panel = page.locator(".ui-autocomplete-panel:visible, .ui-selectonemenu-panel:visible").first
     panel.wait_for(state="visible", timeout=3000)
 
-    # --- SCREENSHOT ---
-    page.screenshot(path=f"dropdown_{val}_{int(time.time())}.png")
+    # 3. ELEMENT-ONLY SCREENSHOT of the open panel (preferred)
+    path = get_screenshot_path(f"dropdown_{val}")
+    panel.screenshot(path=path)
+    print(f"[screenshot saved] {path}")
 
-    # 3. Small delay to allow the list to populate/animate
+    # 4. Small delay to allow the list to populate/animate
     page.wait_for_timeout(300)
 
-    # 4. Target the <li> item specifically.
+    # 5. Target the <li> item specifically.
     # We can use the class the recorder found: .ui-autocomplete-item
     target_item = panel.locator("li").filter(has_text=val).first
     
-    # 5. Click the item
+    # 6. Click the item
     target_item.click()
 
-    # 6. Wait for the panel to disappear
+    # 7. Wait for the panel to disappear
     panel.wait_for(state="hidden", timeout=2000)
