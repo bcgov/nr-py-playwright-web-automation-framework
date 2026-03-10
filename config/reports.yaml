@@ -19,11 +19,11 @@ reports:
         selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
  #       select_all: true
         values:
-          - "9 - Fort Nelson - Peace"
           - "5 - Northern Interior"
           - "6 - Skeena"
+          - "7 - Southern Interior"          
           - "8 - Southern Cariboo"
-          - "7 - Southern Interior"
+          - "9 - Fort Nelson - Peace"
       start_month:
         type: dropdown
         selector: "[id='form:selectFromMonth'] button"
@@ -54,17 +54,18 @@ reports:
         type: checkbox
         selector: '[id="form:j_idt50"]'
       mills_dropdown:
+        type: checkbox_dropdown
         selector: 'label:has-text("Mill") >> .. >> .ui-selectcheckboxmenu-trigger'
-        checkboxes: []
+        values: []
       zones_dropdown:
         type: checkbox_dropdown
         selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
         values:
-          - "9 - Fort Nelson - Peace"
           - "5 - Northern Interior"
           - "6 - Skeena"
+          - "7 - Southern Interior"          
           - "8 - Southern Cariboo"
-          - "7 - Southern Interior"
+          - "9 - Fort Nelson - Peace"
       start_month:
         type: dropdown
         selector: "[id='form:selectFromMonth'] button"
@@ -85,4 +86,107 @@ reports:
         type: checkbox
         selector: '[id="form:j_idt83"]'
         value: true
+    download_button: 'role=button[name="PDF"]'
+
+  R12 - Sales Summary Audit:
+
+    # Navigate to report
+    menu_selector: 'role=link[name="Reports"]'
+    report_selector: 'role=link[name="R12 - Sales Summary Audit"]'
+
+    inputs:
+
+      mills_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text("Mill") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values: []
+      zones_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values:
+          - "5 - Northern Interior"
+          - "6 - Skeena"
+          - "7 - Southern Interior"          
+          - "8 - Southern Cariboo"
+          - "9 - Fort Nelson - Peace"
+      start_month:
+        type: dropdown
+        selector: "[id='form:selectFromMonth'] button"
+        value: "JAN"
+      start_year:
+        type: input
+        selector: "[id='form:selectFromYear']"
+        value: "2017"
+      end_month:
+        type: dropdown
+        selector: "[id='form:selectToMonth'] button"
+        value: "MAR"
+      end_year:
+        type: input
+        selector: "[id='form:selectToYear']"
+        value: "2026"
+      detail_mode:
+        type: checkbox
+        selector: '[id="form:j_idt69"]'
+        value: true
+    download_button: 'role=button[name="PDF"]'
+
+
+  R13 - Ad Hoc:
+
+    # Navigate to report
+    menu_selector: 'role=link[name="Reports"]'
+    report_selector: 'role=link[name="R13 - Ad Hoc"]'
+
+    inputs:
+
+      Report_Name:
+        type: input
+        selector: "[id='form:j_idt47']"
+        value: "Test Report"
+      mills_Number_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text(" Mill Number(s)") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values: []
+      mills_Name_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text(" Mill Names(s)") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values: []
+      zones_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values:
+          - "5 - Northern Interior"
+          - "6 - Skeena"
+          - "7 - Southern Interior"          
+          - "8 - Southern Cariboo"
+          - "9 - Fort Nelson - Peace"
+      Summary_Report_Type:
+        type: checkbox
+        selector: '[id="form:reportType"] ul > li:has-text("Regular Chip")'
+      zones_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values:
+          - "5 - Northern Interior"
+          - "6 - Skeena"
+          - "7 - Southern Interior"          
+          - "8 - Southern Cariboo"
+          - "9 - Fort Nelson - Peace"
+      start_month:
+        type: dropdown
+        selector: "[id='form:selectFromMonth'] button"
+        value: "JAN"
+      start_year:
+        type: input
+        selector: "[id='form:selectFromYear']"
+        value: "2017"
+      end_month:
+        type: dropdown
+        selector: "[id='form:selectToMonth'] button"
+        value: "MAR"
+      end_year:
+        type: input
+        selector: "[id='form:selectToYear']"
+        value: "2026"
     download_button: 'role=button[name="PDF"]'
