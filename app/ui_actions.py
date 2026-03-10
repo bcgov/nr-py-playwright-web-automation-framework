@@ -51,16 +51,19 @@ def fill_input(page, selector, value):
     # 2. Clear the field manually if .fill() isn't working perfectly
     element.fill("")
     page.wait_for_timeout(50)
-     
+
     # 3. Type the new value
     element.type(str(value), delay=50) 
     # 4. CRITICAL: Press Tab to trigger the 'onchange' or 'onblur' event
     element.press("Tab")
 
 def set_checkbox(page, selector, checked=True):
-    # Works for direct checkbox selectors; for labels, use click_selector('label:has-text("...")')
-    if page.is_checked(selector) != checked:
-        page.click(selector)
+    box = page.locator(f"{selector} .ui-chkbox-box")
+    class_attr = box.get_attribute("class") or ""
+    is_checked = "ui-state-active" in class_attr
+
+    if checked != is_checked:
+        box.click()
 
 def _parse_role_selector(selector: str):
     m = re.match(r'^role=(\w+)\[name="(.+)"\]$', selector.strip())
@@ -142,3 +145,30 @@ def set_dropdown_by_text(page, selector, val):
 
     # 7. Wait for the panel to disappear
     panel.wait_for(state="hidden", timeout=2000)
+
+
+from playwright.sync_api import Page
+
+def set_checkbox_by_label(page: Page, label_text: str, desired: bool) -> None:
+    """Set checkbox state using label text."""
+
+    # 1. Try standard HTML checkbox
+    try:
+        cb = page.get_by_label(label_text)
+        cb.set_checked(desired)
+        return
+    except Exception:
+        pass
+
+    # 2. PrimeFaces checkbox
+    label = page.locator(f'label:has-text("{label_text}")').first
+    label.wait_for(state="visible")
+
+    container = label.locator("xpath=ancestor::*[contains(@class,'ui-chkbox')][1]")
+    box = container.locator(".ui-chkbox-box")
+
+    # determine current state
+    is_checked = "ui-state-active" in (box.get_attribute("class") or "")
+
+    if is_checked != desired:
+        box.click()

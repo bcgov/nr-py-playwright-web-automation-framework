@@ -42,50 +42,47 @@ reports:
         value: "2026"
     download_button: 'role=button[name="PDF"]'
 
+  r11_lumber_chip_summary:
 
+    # Navigate to report
+    menu_selector: 'role=link[name="Reports"]'
+    report_selector: 'role=link[name="R11 - Lumber/Chip Summary"]'
 
-  # r11_lumber_chip_summary:
+    inputs:
 
-  #   # Navigate to report
-  #   menu_selector: 'role=link[name="Reports"]'
-  #   report_selector: 'role=link[name="R11 - Lumber/Chip Summary"]'
-
-  #   inputs:
-
-  #     leading_toggle:
-  #       type: checkbox
-  #       selector: 'label:has-text("Whole Log")'
-  #       value: true
-  #     mills_dropdown:
-  #       selector: 'label:has-text("Mill") >> .. >> .ui-selectcheckboxmenu-trigger'
-  #       checkboxes: []
-  #     zones_dropdown:
-  #       type: checkbox_dropdown
-  #       selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
-  #       values:
-  #         - "9 - Fort Nelson - Peace"
-  #         - "5 - Northern Interior"
-  #         - "6 - Skeena"
-  #         - "8 - Southern Cariboo"
-  #         - "7 - Southern Interior"
-  #     start_month:
-  #       type: dropdown
-  #       selector: "[id='form:selectFromMonth']"
-  #       value: "JAN"
-  #     start_year:
-  #       type: input
-  #       selector: "[id='form:selectFromYear']"
-  #       value: "2017"
-  #     end_month:
-  #       type: dropdown
-  #       selector: "[id='form:selectToMonth']"
-  #       value: "MAR"
-  #     end_year:
-  #       type: input
-  #       selector: "[id='form:selectToYear']"
-  #       value: "2026"
-  #     detail_mode:
-  #       type: checkbox
-  #       selector: 'label:has-text("Detail")'
-  #       value: true
-  #   download_button: 'role=button[name="PDF"]'
+      leading_toggle:
+        type: checkbox
+        selector: '[id="form:j_idt50"]'
+      mills_dropdown:
+        selector: 'label:has-text("Mill") >> .. >> .ui-selectcheckboxmenu-trigger'
+        checkboxes: []
+      zones_dropdown:
+        type: checkbox_dropdown
+        selector: 'label:has-text("Zone") >> .. >> .ui-selectcheckboxmenu-trigger'
+        values:
+          - "9 - Fort Nelson - Peace"
+          - "5 - Northern Interior"
+          - "6 - Skeena"
+          - "8 - Southern Cariboo"
+          - "7 - Southern Interior"
+      start_month:
+        type: dropdown
+        selector: "[id='form:selectFromMonth'] button"
+        value: "JAN"
+      start_year:
+        type: input
+        selector: "[id='form:selectFromYear']"
+        value: "2017"
+      end_month:
+        type: dropdown
+        selector: "[id='form:selectToMonth'] button"
+        value: "MAR"
+      end_year:
+        type: input
+        selector: "[id='form:selectToYear']"
+        value: "2026"
+      detail_mode:
+        type: checkbox
+        selector: '[id="form:j_idt83"]'
+        value: true
+    download_button: 'role=button[name="PDF"]'

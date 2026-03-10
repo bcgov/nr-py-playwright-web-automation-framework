@@ -16,6 +16,7 @@ from app.ui_actions import (
     set_checkbox,
     set_dropdown_by_text,  # PrimeFaces dropdown
     select_checkbox_menu,  # PrimeFaces multi-checkbox menu
+    set_checkbox_by_label,
 )
 
 
@@ -44,8 +45,18 @@ def _apply_input(page, spec: Dict[str, Any]):
 
         # if selector targets label
         if sel and sel.startswith('label:has-text("'):
-            click_selector(page, sel)
+            # Extract label text inside the quotes
+            label_text = sel.split('label:has-text("', 1)[1].rsplit('")', 1)[0]
+            try:
+                # Primary path: use accessible label to target the input
+                cb = page.get_by_label(label_text)
+                cb.set_checked(desired)
+                assert cb.is_checked() == desired, f"Checkbox '{label_text}' not set to {desired}"
+            except Exception:
+                # Fallbacks for custom widgets (PrimeFaces, etc.)
+                set_checkbox_by_label(page, label_text, desired)
         else:
+            # If a direct input selector was provided
             set_checkbox(page, sel, checked=desired)
 
     # ---------- PRIMEFACES CHECKBOX DROPDOWN ----------
