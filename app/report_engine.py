@@ -11,8 +11,10 @@ import os
 from app.pdf_tools import pdf_to_images
 from app.ui_actions import (
     click_selector,
+    select_menu,
     fill_input,
-    select_dropdown,       # native <select>
+    select_dropdown,
+    select_menu_item,       # native <select>
     set_checkbox,
     set_dropdown_by_text,  # PrimeFaces dropdown
     select_checkbox_menu,  # PrimeFaces multi-checkbox menu
@@ -104,8 +106,17 @@ def _apply_input(page, spec: Dict[str, Any]):
 def _run_single(page, name: str, entry: Dict[str, Any], downloads: Path, shots: Path):
 
     # Navigate to report
-    click_selector(page, entry["menu_selector"])
-    click_selector(page, entry["report_selector"])
+
+    # Click the top menu and take a screenshot of the dropdown
+    select_menu(
+        page,
+        menu_selector=entry["menu"]["menu_selector"],
+        expanded_selector=entry["menu"].get("expanded_selector"),   # optional
+        screenshot_path=f"screenshots/{name}/menu_expanded.png"
+    )
+   
+   # 2️⃣ Select the report inside the dropdown
+    select_menu_item(page, entry["Report"]["report_selector"])
 
     # 1. Wait for the report page to load stable
     page.wait_for_load_state("networkidle")

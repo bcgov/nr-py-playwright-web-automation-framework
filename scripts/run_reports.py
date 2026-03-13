@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from logging import root
 import os
 from pathlib import Path
 
@@ -28,6 +29,7 @@ PASSWORD = os.getenv("PASSWORD")
 NAV_TIMEOUT_MS = 120_000  # 120s for SSO redirects
 
 def safe_goto(page, url: str, *, timeout_ms: int = NAV_TIMEOUT_MS, attempts: int = 2):
+    """Navigate with retry logic."""
     last_err = None
     for i in range(1, attempts + 1):
         try:
@@ -46,7 +48,7 @@ def load_app_url_from_yaml(yaml_path: Path) -> str:
 
 def main():   
     parser = argparse.ArgumentParser(
-        description="Run ISP reports defined in config/reports.yaml"
+        description="Run reports defined in config/reports.yaml"
     )
     parser.add_argument(
         "--reports",
@@ -75,12 +77,22 @@ def main():
     APP_URL = load_app_url_from_yaml(REPORTS_YAML)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=args.headless)
+        
+        browser = p.chromium.launch(
+            headless=args.headless,
+            args=["--window-size=1920,1080"]
+        )
+
+            # Shared Playwright context settings
+        context_settings = {
+            "viewport": {"width": 1920, "height": 1080},             # Use full browser window
+            "device_scale_factor": 2       # HiDPI screenshots (sharp)
+        }
         
         # First-time or forced fresh login
         if args.fresh_login or not AUTH_FILE.exists():
             # Fresh login path: create a clean context and let app_login handle auth + storage save.
-            context = browser.new_context()
+            context = browser.new_context(**context_settings)
             page = context.new_page()       
 
             if not EMAIL or not PASSWORD:
@@ -90,8 +102,17 @@ def main():
             app_login(page, context, APP_URL, EMAIL, PASSWORD)
             context.close()
 
-        # Use the saved storage for actual report runs
-        context = browser.new_context(storage_state=str(AUTH_FILE)) if AUTH_FILE.exists() else browser.new_context()
+        # ---------------------------------------------------
+        # Create context for report execution
+        # ---------------------------------------------------
+        if AUTH_FILE.exists():
+            context = browser.new_context(
+                storage_state=str(AUTH_FILE),
+                **context_settings
+            )
+        else:
+            context = browser.new_context(**context_settings)
+
         page = context.new_page()
         
         # Navigate to the app before the engine runs

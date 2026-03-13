@@ -37,10 +37,6 @@ def select_dropdown(page, selector, value):
     element.screenshot(path=path)
     print(f"[screenshot saved] {path}")
 
-    # --- ELEMENT-ONLY SCREENSHOT ---
- #   element.screenshot(path=get_screenshot_path("dropdown"))
-
-
 def fill_input(page, selector, value):
     element = page.locator(selector)
     # 1. Click to focus and clear any existing default text
@@ -84,6 +80,37 @@ def click_selector(page, selector: str):
     else:
         page.locator(selector).click()
 
+def select_menu(
+    page, menu_selector, expanded_selector=None, screenshot_path=None, wait_ms=500
+):
+    """
+    Click a menu, wait for dropdown expansion, and optionally take a screenshot.
+    """
+    # --- 1️⃣ Click the menu ---
+    if menu_selector.startswith("role="):
+        role, name = _parse_role_selector(menu_selector)
+        if role and name:
+            page.get_by_role(role, name=name).click()
+        else:
+            page.locator(menu_selector).click()
+    elif menu_selector.startswith("text="):
+        page.get_by_text(menu_selector.split("=", 1)[1], exact=True).click()
+    else:
+        page.locator(menu_selector).click()
+
+    # --- 2️⃣ Wait for the menu to expand ---
+    page.wait_for_timeout(wait_ms)
+
+    # --- 3️⃣ Take element-only screenshot ---
+    if screenshot_path:
+        Path(screenshot_path).parent.mkdir(parents=True, exist_ok=True)
+
+        if expanded_selector:
+            page.locator(expanded_selector).screenshot(path=screenshot_path)
+        else:
+            page.screenshot(path=screenshot_path, full_page=True)
+
+        print(f"[screenshot saved] {screenshot_path}")
 
 def select_checkbox_menu(page, selector, options):
     # Find the active panel
@@ -146,9 +173,6 @@ def set_dropdown_by_text(page, selector, val):
     # 7. Wait for the panel to disappear
     panel.wait_for(state="hidden", timeout=2000)
 
-
-from playwright.sync_api import Page
-
 def set_checkbox_by_label(page: Page, label_text: str, desired: bool) -> None:
     """Set checkbox state using label text."""
 
@@ -172,3 +196,16 @@ def set_checkbox_by_label(page: Page, label_text: str, desired: bool) -> None:
 
     if is_checked != desired:
         box.click()
+
+def select_menu_item(page, item_selector):
+    """
+    Click an item inside an expanded dropdown menu.
+    """
+    if item_selector.startswith("role="):
+        role, name = _parse_role_selector(item_selector)
+        if role and name:
+            page.get_by_role(role, name=name).click()
+        else:
+            page.locator(item_selector).click()
+    else:
+        page.locator(item_selector).click()
